@@ -367,6 +367,12 @@
         function TestPipelineNode({ data }) {
             return React.createElement('div', { className: 'custom-node' },
                 React.createElement('div', { className: 'node-label' }, data.label),
+                // For Level 2 nodes (tests), show single LED with own status
+                data.level === 2 && data.status &&
+                    React.createElement('div', { className: 'led-row' },
+                        React.createElement('div', { className: `led ${data.status}` })
+                    ),
+                // For Level 0 and 1 nodes (pipeline and suites), show LEDs for children
                 data.childStatuses && data.childStatuses.length > 0 &&
                     React.createElement('div', { className: 'led-row' },
                         data.childStatuses.map((status, idx) =>
@@ -449,7 +455,8 @@
                         data: {
                             label: `Test ${i + 1}.${j + 1}`,
                             childStatuses: [],
-                            level: 2
+                            level: 2,
+                            status: null // Will be set to running/passed/failed
                         },
                         position: { x: level2X, y: level2Y },
                         className: 'level-2',
@@ -474,10 +481,22 @@
             const [pipelineData] = useState(() => generateTestPipeline());
             const [nodes, setNodes] = useState(pipelineData.nodes);
             const [edges] = useState(pipelineData.edges);
+            const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
             const nodeTypes = useMemo(() => ({
                 testPipeline: TestPipelineNode
             }), []);
+
+            // Auto-fit view when nodes change visibility
+            useEffect(() => {
+                if (reactFlowInstance) {
+                    // Wait a bit for layout to settle, then fit view
+                    const timer = setTimeout(() => {
+                        reactFlowInstance.fitView({ padding: 0.2, duration: 400 });
+                    }, 100);
+                    return () => clearTimeout(timer);
+                }
+            }, [nodes, reactFlowInstance]);
 
             useEffect(() => {
                 if (!shouldRun) return;
@@ -497,7 +516,11 @@
                             if (nodeIdx !== -1) {
                                 newNodes[nodeIdx] = {
                                     ...newNodes[nodeIdx],
-                                    hidden: false // Show the node
+                                    hidden: false, // Show the node
+                                    data: {
+                                        ...newNodes[nodeIdx].data,
+                                        status: STATUS.RUNNING // Set own status to running
+                                    }
                                 };
                             }
                             return newNodes;
@@ -522,6 +545,18 @@
                             if (childIndex !== -1) {
                                 const updatedStatuses = [...parentNode.data.childStatuses];
                                 updatedStatuses[childIndex] = willPass ? STATUS.PASSED : STATUS.FAILED;
+
+                                // Update test node's own status
+                                const testNodeIdx = newNodes.findIndex(n => n.id === node.id);
+                                if (testNodeIdx !== -1) {
+                                    newNodes[testNodeIdx] = {
+                                        ...newNodes[testNodeIdx],
+                                        data: {
+                                            ...newNodes[testNodeIdx].data,
+                                            status: willPass ? STATUS.PASSED : STATUS.FAILED
+                                        }
+                                    };
+                                }
 
                                 const parentIdx = newNodes.findIndex(n => n.id === parentId);
                                 newNodes[parentIdx] = {
@@ -591,6 +626,7 @@
                     nodes: nodes,
                     edges: edges,
                     nodeTypes: nodeTypes,
+                    onInit: setReactFlowInstance,
                     fitView: true,
                     attributionPosition: 'bottom-left',
                     minZoom: 0.3,
