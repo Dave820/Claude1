@@ -248,7 +248,52 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; font-size: 1.5em; color: white;">
+            Loading Test Pipeline Simulator...
+        </div>
+    </div>
+    <div id="error-display" style="display: none; position: fixed; top: 20px; left: 20px; right: 20px; background: #fee; border: 2px solid #f00; padding: 20px; border-radius: 10px; z-index: 9999; max-height: 80vh; overflow: auto; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;"></div>
+
+    <script>
+        // Global error handler
+        window.onerror = function(message, source, lineno, colno, error) {
+            const errorDiv = document.getElementById('error-display');
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = 'ERROR:\n' + message + '\n\nAt: ' + source + ':' + lineno + ':' + colno + '\n\nStack:\n' + (error ? error.stack : 'No stack trace');
+            return true;
+        };
+
+        // Check if dependencies are loaded
+        window.addEventListener('load', function() {
+            const errorDiv = document.getElementById('error-display');
+            const errors = [];
+
+            if (typeof React === 'undefined') errors.push('React not loaded');
+            if (typeof ReactDOM === 'undefined') errors.push('ReactDOM not loaded');
+            if (typeof Babel === 'undefined') errors.push('Babel not loaded');
+            if (typeof window.ReactFlow === 'undefined') errors.push('ReactFlow not loaded');
+
+            if (errors.length > 0) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = 'Missing dependencies:\n' + errors.join('\n');
+            }
+        });
+
+        // Timeout check - if still loading after 10 seconds, show error
+        setTimeout(function() {
+            const root = document.getElementById('root');
+            if (root && root.innerHTML.includes('Loading Test Pipeline Simulator')) {
+                const errorDiv = document.getElementById('error-display');
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = 'TIMEOUT: App failed to load within 10 seconds.\n\nPossible issues:\n- Network connection slow\n- CDN resources blocked\n- JavaScript execution failed\n\nDependency status:\n' +
+                    'React: ' + (typeof React !== 'undefined' ? 'OK' : 'MISSING') + '\n' +
+                    'ReactDOM: ' + (typeof ReactDOM !== 'undefined' ? 'OK' : 'MISSING') + '\n' +
+                    'Babel: ' + (typeof Babel !== 'undefined' ? 'OK' : 'MISSING') + '\n' +
+                    'ReactFlow: ' + (typeof window.ReactFlow !== 'undefined' ? 'OK' : 'MISSING');
+            }
+        }, 10000);
+    </script>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
@@ -506,8 +551,14 @@
             );
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<App />);
+        } catch (error) {
+            const errorDiv = document.getElementById('error-display');
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = 'RENDER ERROR:\n' + error.message + '\n\nStack:\n' + error.stack;
+        }
     </script>
 </body>
 </html>
