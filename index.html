@@ -452,7 +452,8 @@
                             level: 2
                         },
                         position: { x: level2X, y: level2Y },
-                        className: 'level-2'
+                        className: 'level-2',
+                        hidden: true // Initially hide all test nodes
                     });
 
                     edges.push({
@@ -484,9 +485,26 @@
                 const level2Nodes = pipelineData.nodes.filter(n => n.data.level === 2);
 
                 level2Nodes.forEach((node) => {
-                    const delay = randomInRange(1000, 4000);
-                    const willPass = Math.random() > 0.2;
+                    const startDelay = randomInRange(500, 3000); // Random start time
+                    const testDuration = randomInRange(1000, 3000); // Random test duration
+                    const willPass = Math.random() > 0.2; // 80% pass rate
 
+                    // Start the test - show node and set to running
+                    setTimeout(() => {
+                        setNodes(prevNodes => {
+                            const newNodes = [...prevNodes];
+                            const nodeIdx = newNodes.findIndex(n => n.id === node.id);
+                            if (nodeIdx !== -1) {
+                                newNodes[nodeIdx] = {
+                                    ...newNodes[nodeIdx],
+                                    hidden: false // Show the node
+                                };
+                            }
+                            return newNodes;
+                        });
+                    }, startDelay);
+
+                    // Complete the test
                     setTimeout(() => {
                         const parentEdge = edges.find(e => e.target === node.id);
                         if (!parentEdge) return;
@@ -514,6 +532,7 @@
                                     }
                                 };
 
+                                // Update root node status
                                 const allComplete = updatedStatuses.every(s =>
                                     s === STATUS.PASSED || s === STATUS.FAILED
                                 );
@@ -545,7 +564,25 @@
 
                             return newNodes;
                         });
-                    }, delay);
+
+                        // If test passed, hide it after 1 second
+                        if (willPass) {
+                            setTimeout(() => {
+                                setNodes(prevNodes => {
+                                    const newNodes = [...prevNodes];
+                                    const nodeIdx = newNodes.findIndex(n => n.id === node.id);
+                                    if (nodeIdx !== -1) {
+                                        newNodes[nodeIdx] = {
+                                            ...newNodes[nodeIdx],
+                                            hidden: true // Hide passed nodes
+                                        };
+                                    }
+                                    return newNodes;
+                                });
+                            }, 1000);
+                        }
+                        // If failed, keep it visible (don't hide)
+                    }, startDelay + testDuration);
                 });
             }, [shouldRun, edges, pipelineData.nodes]);
 

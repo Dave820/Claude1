@@ -53,11 +53,15 @@ You can also view the HTML file directly:
 ### Test Execution Simulation
 
 1. Click the "Run Tests" button to start the simulation
-2. Each test node (Level 2) completes after a random delay (1-4 seconds)
-3. Tests have an 80% pass rate (randomly determined)
+2. Each test starts at a random time (0.5-3 seconds) and runs for a random duration (1-3 seconds)
+3. **Test nodes only appear when running or failed:**
+   - Tests are hidden initially
+   - When a test starts, its node appears with green pulsing LED (running)
+   - If test passes (80% chance): node disappears 1 second after completion
+   - If test fails (20% chance): node stays visible with red LED (failed)
 4. Parent nodes (Level 1) show LEDs representing each child test's status
 5. The root node (Level 0) shows LEDs representing each test suite's status
-6. Watch as LEDs change from green (running) to blue (passed) or red (failed)
+6. Watch as test nodes dynamically appear and disappear based on their status
 
 ### Visual Elements
 
@@ -88,8 +92,11 @@ The app uses React hooks (useState, useEffect, useMemo, useCallback) for state m
 The pipeline structure is randomly generated each time you click "Run Tests":
 - Between 3-5 test suites are created
 - Each test suite has between 3-5 individual tests
-- Tests complete at random intervals (1-4 seconds)
+- Tests start at random times (0.5-3 seconds)
+- Tests run for random durations (1-3 seconds)
 - 80% of tests pass, 20% fail (configurable in the code)
+- Passed tests automatically hide after 1 second
+- Failed tests remain visible indefinitely
 
 ## Browser Compatibility
 
