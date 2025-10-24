@@ -145,6 +145,63 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
+        .custom-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .node-label {
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .led-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+                        inset 0 0 4px rgba(0, 0, 0, 0.2);
+            animation: ledPulse 2s ease-in-out infinite;
+        }
+
+        .led:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .led:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .led:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .led:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        @keyframes ledPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(0.95);
+            }
+        }
+
         .react-flow__edge-path {
             stroke: #667eea;
             stroke-width: 3;
@@ -189,7 +246,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+        const { useState, useEffect, useCallback, useMemo } = React;
         const { ReactFlow, Controls, Background } = window.ReactFlow;
 
         const MESSAGES = [
@@ -210,11 +267,26 @@
             "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
         ];
 
+        // Custom Node Component with LEDs
+        function CustomNodeWithLEDs({ data }) {
+            return (
+                <div className="custom-node">
+                    <div className="node-label">{data.label}</div>
+                    <div className="led-row">
+                        <div className="led"></div>
+                        <div className="led"></div>
+                        <div className="led"></div>
+                        <div className="led"></div>
+                    </div>
+                </div>
+            );
+        }
+
         // Define initial nodes
         const initialNodes = [
             {
                 id: '1',
-                type: 'default',
+                type: 'customNode',
                 data: { label: 'Hello' },
                 position: { x: 100, y: 150 },
                 className: 'green-node',
@@ -222,8 +294,6 @@
                     background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                     color: 'white',
                     border: 'none',
-                    fontSize: '2em',
-                    fontWeight: 'bold',
                     padding: '20px 40px',
                     borderRadius: '10px',
                     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
@@ -231,7 +301,7 @@
             },
             {
                 id: '2',
-                type: 'default',
+                type: 'customNode',
                 data: { label: 'World' },
                 position: { x: 400, y: 150 },
                 className: 'red-node',
@@ -239,8 +309,6 @@
                     background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                     color: 'white',
                     border: 'none',
-                    fontSize: '2em',
-                    fontWeight: 'bold',
                     padding: '20px 40px',
                     borderRadius: '10px',
                     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
@@ -263,11 +331,17 @@
             const [nodes, setNodes] = useState(initialNodes);
             const [edges, setEdges] = useState(initialEdges);
 
+            // Define custom node types
+            const nodeTypes = useMemo(() => ({
+                customNode: CustomNodeWithLEDs
+            }), []);
+
             return (
                 <div className="flow-container">
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
+                        nodeTypes={nodeTypes}
                         fitView
                         attributionPosition="bottom-left"
                     >

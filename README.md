@@ -7,6 +7,7 @@ A simple, interactive hello world web application that runs perfectly on your iP
 - Beautiful, responsive design optimized for iPad
 - Interactive React Flow diagram showing "Hello" and "World" nodes
 - Green gradient "Hello" node and red gradient "World" node connected with an animated edge
+- Each node features 4 pulsing LED indicators for a modern tech look
 - Interactive buttons to change messages and colors
 - Smooth animations and modern UI
 - Real-time clock display
@@ -48,6 +49,7 @@ You can also view the HTML file directly:
 - Shows an interactive React Flow diagram with two nodes:
   - Green "Hello" node with a beautiful gradient
   - Red "World" node with a gradient effect
+  - Each node displays 4 LED indicators (small filled circles with pulsing animation)
   - Animated connection between the nodes
   - Pan and zoom controls for the diagram
 - Click "Click Me!" to cycle through different greeting messages
