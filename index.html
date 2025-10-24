@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World App - React</title>
+    <title>Hello World App - React Flow</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reactflow@11.10.4/dist/umd/index.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reactflow@11.10.4/dist/style.css">
     <style>
         * {
             margin: 0;
@@ -18,7 +20,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             padding: 20px;
         }
@@ -26,12 +28,13 @@
         .container {
             background: white;
             border-radius: 20px;
-            padding: 60px 40px;
+            padding: 40px 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 600px;
+            max-width: 900px;
             width: 100%;
             animation: fadeIn 0.8s ease-in;
+            margin-bottom: 20px;
         }
 
         @keyframes fadeIn {
@@ -112,17 +115,72 @@
             color: #555;
         }
 
+        .flow-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            height: 400px;
+            animation: fadeIn 0.8s ease-in 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .react-flow__node {
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .react-flow__node.green-node {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .react-flow__node.red-node {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .react-flow__edge-path {
+            stroke: #667eea;
+            stroke-width: 3;
+        }
+
+        .react-flow__edge.animated .react-flow__edge-path {
+            stroke-dasharray: 5;
+            animation: dashdraw 0.5s linear infinite;
+        }
+
+        @keyframes dashdraw {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 2.5em;
             }
 
             .container {
-                padding: 40px 30px;
+                padding: 30px 20px;
             }
 
             p {
                 font-size: 1.1em;
+            }
+
+            .flow-container {
+                height: 300px;
+            }
+
+            .react-flow__node {
+                padding: 15px 30px;
+                font-size: 1.5em;
             }
         }
     </style>
@@ -131,7 +189,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useCallback } = React;
+        const { ReactFlow, Controls, Background } = window.ReactFlow;
 
         const MESSAGES = [
             "Hello from GitHub! 🚀",
@@ -150,6 +209,74 @@
             "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
             "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
         ];
+
+        // Define initial nodes
+        const initialNodes = [
+            {
+                id: '1',
+                type: 'default',
+                data: { label: 'Hello' },
+                position: { x: 100, y: 150 },
+                className: 'green-node',
+                style: {
+                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                    color: 'white',
+                    border: 'none',
+                    fontSize: '2em',
+                    fontWeight: 'bold',
+                    padding: '20px 40px',
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }
+            },
+            {
+                id: '2',
+                type: 'default',
+                data: { label: 'World' },
+                position: { x: 400, y: 150 },
+                className: 'red-node',
+                style: {
+                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    color: 'white',
+                    border: 'none',
+                    fontSize: '2em',
+                    fontWeight: 'bold',
+                    padding: '20px 40px',
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }
+            }
+        ];
+
+        // Define initial edges
+        const initialEdges = [
+            {
+                id: 'e1-2',
+                source: '1',
+                target: '2',
+                animated: true,
+                style: { stroke: '#667eea', strokeWidth: 3 }
+            }
+        ];
+
+        function FlowDiagram() {
+            const [nodes, setNodes] = useState(initialNodes);
+            const [edges, setEdges] = useState(initialEdges);
+
+            return (
+                <div className="flow-container">
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        fitView
+                        attributionPosition="bottom-left"
+                    >
+                        <Controls />
+                        <Background variant="dots" gap={12} size={1} />
+                    </ReactFlow>
+                </div>
+            );
+        }
 
         function App() {
             const [messageIndex, setMessageIndex] = useState(5);
@@ -179,18 +306,21 @@
             };
 
             return (
-                <div className="container">
-                    <div className="emoji">👋</div>
-                    <h1>Hello World!</h1>
-                    <p>{MESSAGES[messageIndex]}</p>
-                    <button onClick={handleChangeMessage}>Click Me!</button>
-                    <button onClick={handleChangeColor}>Change Color</button>
-                    <div className="info">
-                        Created with React, HTML, and CSS<br />
-                        Running from GitHub<br />
-                        Current time: {currentTime.toLocaleTimeString()}
+                <>
+                    <div className="container">
+                        <div className="emoji">👋</div>
+                        <h1>Hello World!</h1>
+                        <p>{MESSAGES[messageIndex]}</p>
+                        <button onClick={handleChangeMessage}>Click Me!</button>
+                        <button onClick={handleChangeColor}>Change Color</button>
+                        <div className="info">
+                            Created with React Flow, React, HTML, and CSS<br />
+                            Running from GitHub<br />
+                            Current time: {currentTime.toLocaleTimeString()}
+                        </div>
                     </div>
-                </div>
+                    <FlowDiagram />
+                </>
             );
         }
 

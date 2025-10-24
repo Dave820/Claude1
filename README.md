@@ -5,6 +5,8 @@ A simple, interactive hello world web application that runs perfectly on your iP
 ## Features
 
 - Beautiful, responsive design optimized for iPad
+- Interactive React Flow diagram showing "Hello" and "World" nodes
+- Green gradient "Hello" node and red gradient "World" node connected with an animated edge
 - Interactive buttons to change messages and colors
 - Smooth animations and modern UI
 - Real-time clock display
@@ -43,6 +45,11 @@ You can also view the HTML file directly:
 ## What It Does
 
 - Displays a colorful "Hello World" message
+- Shows an interactive React Flow diagram with two nodes:
+  - Green "Hello" node with a beautiful gradient
+  - Red "World" node with a gradient effect
+  - Animated connection between the nodes
+  - Pan and zoom controls for the diagram
 - Click "Click Me!" to cycle through different greeting messages
 - Click "Change Color" to change the background gradient
 - Shows the current time, updated every second
@@ -51,11 +58,12 @@ You can also view the HTML file directly:
 ## Technologies Used
 
 - React 18 (loaded from CDN)
+- React Flow 11 (for interactive node diagrams)
 - HTML5
 - CSS3 (with animations and gradients)
 - Babel (for JSX transformation)
 
-The app uses React hooks (useState, useEffect) for state management and side effects, making the code clean and maintainable while still running directly from GitHub without a build process.
+The app uses React hooks (useState, useEffect) for state management and side effects, along with React Flow for creating an interactive node-based diagram. The flow diagram features custom-styled nodes with gradient backgrounds, animated edges, and built-in controls for panning and zooming. Everything runs directly from GitHub without a build process.
 
 ## Browser Compatibility
 
