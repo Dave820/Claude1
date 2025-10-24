@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World App - React Flow</title>
+    <title>Test Pipeline Simulator - React Flow</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -23,15 +23,16 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .container {
             background: white;
             border-radius: 20px;
-            padding: 40px 30px;
+            padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 900px;
+            max-width: 1200px;
             width: 100%;
             animation: fadeIn 0.8s ease-in;
             margin-bottom: 20px;
@@ -49,9 +50,9 @@
         }
 
         h1 {
-            font-size: 3.5em;
+            font-size: 2.5em;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -59,42 +60,30 @@
         }
 
         p {
-            font-size: 1.3em;
+            font-size: 1.1em;
             color: #666;
             line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .emoji {
-            font-size: 4em;
             margin-bottom: 20px;
-            animation: wave 2s ease-in-out infinite;
-            display: inline-block;
         }
 
-        @keyframes wave {
-            0%, 100% {
-                transform: rotate(0deg);
-            }
-            25% {
-                transform: rotate(20deg);
-            }
-            75% {
-                transform: rotate(-20deg);
-            }
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
+            padding: 12px 30px;
+            font-size: 1em;
             border-radius: 50px;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             font-weight: 600;
-            margin: 10px;
         }
 
         button:hover {
@@ -106,13 +95,27 @@
             transform: translateY(0);
         }
 
-        .info {
-            margin-top: 30px;
-            padding: 20px;
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
             background: #f8f9fa;
             border-radius: 10px;
             font-size: 0.9em;
-            color: #555;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
 
         .flow-container {
@@ -120,124 +123,126 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
+            max-width: 1200px;
             width: 100%;
-            height: 400px;
+            height: 600px;
             animation: fadeIn 0.8s ease-in 0.2s;
             animation-fill-mode: both;
-        }
-
-        .react-flow__node {
-            padding: 20px 40px;
-            border-radius: 10px;
-            font-size: 2em;
-            font-weight: bold;
-            color: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .react-flow__node.green-node {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .react-flow__node.red-node {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
         .custom-node {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            min-width: 120px;
         }
 
         .node-label {
-            font-size: 2em;
+            font-size: 0.9em;
             font-weight: bold;
             color: white;
+            text-align: center;
         }
 
         .led-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
+            max-width: 150px;
         }
 
         .led {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3),
                         inset 0 0 4px rgba(0, 0, 0, 0.2);
-            animation: ledPulse 2s ease-in-out infinite;
+            transition: background-color 0.3s ease;
         }
 
-        .led:nth-child(1) {
-            animation-delay: 0s;
+        .led.running {
+            background: #4ade80;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.8),
+                        inset 0 0 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        .led:nth-child(2) {
-            animation-delay: 0.5s;
+        .led.passed {
+            background: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.6),
+                        inset 0 0 4px rgba(0, 0, 0, 0.2);
         }
 
-        .led:nth-child(3) {
-            animation-delay: 1s;
+        .led.failed {
+            background: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.8),
+                        inset 0 0 4px rgba(0, 0, 0, 0.2);
+            animation: failPulse 0.8s ease-in-out 3;
         }
 
-        .led:nth-child(4) {
-            animation-delay: 1.5s;
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
         }
 
-        @keyframes ledPulse {
+        @keyframes failPulse {
             0%, 100% {
                 opacity: 1;
                 transform: scale(1);
             }
             50% {
-                opacity: 0.7;
-                transform: scale(0.95);
+                opacity: 0.8;
+                transform: scale(1.1);
             }
+        }
+
+        .react-flow__node {
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .react-flow__node.level-0 {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        .react-flow__node.level-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .react-flow__node.level-2 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
         .react-flow__edge-path {
-            stroke: #667eea;
-            stroke-width: 3;
+            stroke: #94a3b8;
+            stroke-width: 2;
         }
 
-        .react-flow__edge.animated .react-flow__edge-path {
-            stroke-dasharray: 5;
-            animation: dashdraw 0.5s linear infinite;
-        }
-
-        @keyframes dashdraw {
-            to {
-                stroke-dashoffset: -10;
-            }
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             h1 {
-                font-size: 2.5em;
+                font-size: 2em;
             }
 
             .container {
-                padding: 30px 20px;
-            }
-
-            p {
-                font-size: 1.1em;
+                padding: 20px;
             }
 
             .flow-container {
-                height: 300px;
+                height: 500px;
             }
 
-            .react-flow__node {
-                padding: 15px 30px;
-                font-size: 1.5em;
+            .legend {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -246,95 +251,228 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback, useMemo } = React;
+        const { useState, useEffect, useMemo } = React;
         const { ReactFlow, Controls, Background } = window.ReactFlow;
 
-        const MESSAGES = [
-            "Hello from GitHub! 🚀",
-            "Welcome to the app! 🎉",
-            "You clicked the button! 👍",
-            "Having fun yet? 😄",
-            "iPad-friendly app! 📱",
-            "Hello World! 👋"
-        ];
+        // Test status constants
+        const STATUS = {
+            RUNNING: 'running',
+            PASSED: 'passed',
+            FAILED: 'failed'
+        };
 
-        const COLORS = [
-            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-            "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-            "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-            "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-            "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
-        ];
+        // Generate random number in range
+        const randomInRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-        // Custom Node Component with LEDs
-        function CustomNodeWithLEDs({ data }) {
+        // Custom Node Component with status LEDs
+        function TestPipelineNode({ data }) {
             return (
                 <div className="custom-node">
                     <div className="node-label">{data.label}</div>
-                    <div className="led-row">
-                        <div className="led"></div>
-                        <div className="led"></div>
-                        <div className="led"></div>
-                        <div className="led"></div>
-                    </div>
+                    {data.childStatuses && data.childStatuses.length > 0 && (
+                        <div className="led-row">
+                            {data.childStatuses.map((status, idx) => (
+                                <div key={idx} className={`led ${status}`}></div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         }
 
-        // Define initial nodes
-        const initialNodes = [
-            {
-                id: '1',
-                type: 'customNode',
-                data: { label: 'Hello' },
-                position: { x: 100, y: 150 },
-                className: 'green-node',
-                style: {
-                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '20px 40px',
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-                }
-            },
-            {
-                id: '2',
-                type: 'customNode',
-                data: { label: 'World' },
-                position: { x: 400, y: 150 },
-                className: 'red-node',
-                style: {
-                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '20px 40px',
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-                }
-            }
-        ];
+        // Generate hierarchical test pipeline structure
+        function generateTestPipeline() {
+            const nodes = [];
+            const edges = [];
+            let nodeId = 0;
 
-        // Define initial edges
-        const initialEdges = [
-            {
-                id: 'e1-2',
-                source: '1',
-                target: '2',
-                animated: true,
-                style: { stroke: '#667eea', strokeWidth: 3 }
+            // Level 0 - Root
+            const rootId = `node-${nodeId++}`;
+            const level1Count = randomInRange(3, 5);
+            const level1Children = [];
+
+            nodes.push({
+                id: rootId,
+                type: 'testPipeline',
+                data: {
+                    label: 'Test Pipeline',
+                    childStatuses: Array(level1Count).fill(STATUS.RUNNING),
+                    level: 0
+                },
+                position: { x: 500, y: 50 },
+                className: 'level-0'
+            });
+
+            // Level 1 - Main test suites
+            const level1XStart = 200;
+            const level1XSpacing = 250;
+
+            for (let i = 0; i < level1Count; i++) {
+                const level1Id = `node-${nodeId++}`;
+                const level2Count = randomInRange(3, 5);
+                level1Children.push({ id: level1Id, childCount: level2Count });
+
+                nodes.push({
+                    id: level1Id,
+                    type: 'testPipeline',
+                    data: {
+                        label: `Suite ${i + 1}`,
+                        childStatuses: Array(level2Count).fill(STATUS.RUNNING),
+                        level: 1
+                    },
+                    position: { x: level1XStart + (i * level1XSpacing), y: 200 },
+                    className: 'level-1'
+                });
+
+                edges.push({
+                    id: `edge-${rootId}-${level1Id}`,
+                    source: rootId,
+                    target: level1Id,
+                    style: { stroke: '#94a3b8', strokeWidth: 2 }
+                });
+
+                // Level 2 - Individual tests
+                const level2XStart = level1XStart + (i * level1XSpacing) - (level2Count * 40);
+                const level2XSpacing = 100;
+
+                for (let j = 0; j < level2Count; j++) {
+                    const level2Id = `node-${nodeId++}`;
+
+                    nodes.push({
+                        id: level2Id,
+                        type: 'testPipeline',
+                        data: {
+                            label: `Test ${i + 1}.${j + 1}`,
+                            childStatuses: [],
+                            level: 2
+                        },
+                        position: { x: level2XStart + (j * level2XSpacing), y: 400 },
+                        className: 'level-2'
+                    });
+
+                    edges.push({
+                        id: `edge-${level1Id}-${level2Id}`,
+                        source: level1Id,
+                        target: level2Id,
+                        style: { stroke: '#94a3b8', strokeWidth: 2 }
+                    });
+                }
             }
-        ];
+
+            return { nodes, edges, level1Children, level1Count };
+        }
 
         function FlowDiagram() {
-            const [nodes, setNodes] = useState(initialNodes);
-            const [edges, setEdges] = useState(initialEdges);
+            const [pipelineData, setPipelineData] = useState(() => generateTestPipeline());
+            const [nodes, setNodes] = useState(pipelineData.nodes);
+            const [edges] = useState(pipelineData.edges);
+            const [isRunning, setIsRunning] = useState(false);
 
             // Define custom node types
             const nodeTypes = useMemo(() => ({
-                customNode: CustomNodeWithLEDs
+                testPipeline: TestPipelineNode
             }), []);
+
+            // Simulate test execution
+            const runTests = useCallback(() => {
+                setIsRunning(true);
+
+                // Reset all to running
+                setNodes(prevNodes => prevNodes.map(node => ({
+                    ...node,
+                    data: {
+                        ...node.data,
+                        childStatuses: node.data.childStatuses?.map(() => STATUS.RUNNING) || []
+                    }
+                })));
+
+                // Get all level 2 nodes (leaf nodes)
+                const level2Nodes = nodes.filter(n => n.data.level === 2);
+
+                // Simulate each test completing after random delay
+                level2Nodes.forEach((node, index) => {
+                    const delay = randomInRange(1000, 4000);
+                    const willPass = Math.random() > 0.2; // 80% pass rate
+
+                    setTimeout(() => {
+                        // Find parent (level 1)
+                        const parentEdge = edges.find(e => e.target === node.id);
+                        if (!parentEdge) return;
+
+                        const parentId = parentEdge.source;
+
+                        // Update level 2 status (for visual feedback)
+                        setNodes(prevNodes => {
+                            const newNodes = [...prevNodes];
+
+                            // Get parent node and its children
+                            const parentNode = newNodes.find(n => n.id === parentId);
+                            if (!parentNode) return prevNodes;
+
+                            const siblingEdges = edges.filter(e => e.source === parentId);
+                            const childIndex = siblingEdges.findIndex(e => e.target === node.id);
+
+                            if (childIndex !== -1) {
+                                const updatedStatuses = [...parentNode.data.childStatuses];
+                                updatedStatuses[childIndex] = willPass ? STATUS.PASSED : STATUS.FAILED;
+
+                                const parentIdx = newNodes.findIndex(n => n.id === parentId);
+                                newNodes[parentIdx] = {
+                                    ...parentNode,
+                                    data: {
+                                        ...parentNode.data,
+                                        childStatuses: updatedStatuses
+                                    }
+                                };
+
+                                // Check if all children of this parent are complete
+                                const allComplete = updatedStatuses.every(s =>
+                                    s === STATUS.PASSED || s === STATUS.FAILED
+                                );
+
+                                if (allComplete) {
+                                    // Update root node
+                                    const rootNode = newNodes.find(n => n.data.level === 0);
+                                    if (rootNode) {
+                                        const allLevel1 = newNodes.filter(n => n.data.level === 1);
+                                        const level1Statuses = allLevel1.map(l1Node => {
+                                            const hasFailures = l1Node.data.childStatuses.some(s => s === STATUS.FAILED);
+                                            const allDone = l1Node.data.childStatuses.every(s =>
+                                                s === STATUS.PASSED || s === STATUS.FAILED
+                                            );
+                                            if (!allDone) return STATUS.RUNNING;
+                                            return hasFailures ? STATUS.FAILED : STATUS.PASSED;
+                                        });
+
+                                        const rootIdx = newNodes.findIndex(n => n.data.level === 0);
+                                        newNodes[rootIdx] = {
+                                            ...rootNode,
+                                            data: {
+                                                ...rootNode.data,
+                                                childStatuses: level1Statuses
+                                            }
+                                        };
+                                    }
+                                }
+                            }
+
+                            return newNodes;
+                        });
+                    }, delay);
+                });
+
+                // Mark as not running after max delay
+                setTimeout(() => {
+                    setIsRunning(false);
+                }, 5000);
+            }, [nodes, edges]);
+
+            const resetPipeline = () => {
+                const newPipeline = generateTestPipeline();
+                setPipelineData(newPipeline);
+                setNodes(newPipeline.nodes);
+                setIsRunning(false);
+            };
 
             return (
                 <div className="flow-container">
@@ -344,6 +482,8 @@
                         nodeTypes={nodeTypes}
                         fitView
                         attributionPosition="bottom-left"
+                        minZoom={0.3}
+                        maxZoom={1.5}
                     >
                         <Controls />
                         <Background variant="dots" gap={12} size={1} />
@@ -353,47 +493,38 @@
         }
 
         function App() {
-            const [messageIndex, setMessageIndex] = useState(5);
-            const [colorIndex, setColorIndex] = useState(0);
-            const [currentTime, setCurrentTime] = useState(new Date());
+            const [key, setKey] = useState(0);
 
-            useEffect(() => {
-                // Update background color
-                document.body.style.background = COLORS[colorIndex];
-            }, [colorIndex]);
-
-            useEffect(() => {
-                // Update time every second
-                const timer = setInterval(() => {
-                    setCurrentTime(new Date());
-                }, 1000);
-
-                return () => clearInterval(timer);
-            }, []);
-
-            const handleChangeMessage = () => {
-                setMessageIndex((prev) => (prev + 1) % MESSAGES.length);
-            };
-
-            const handleChangeColor = () => {
-                setColorIndex((prev) => (prev + 1) % COLORS.length);
+            const handleRunTests = () => {
+                setKey(prev => prev + 1);
             };
 
             return (
                 <>
                     <div className="container">
-                        <div className="emoji">👋</div>
-                        <h1>Hello World!</h1>
-                        <p>{MESSAGES[messageIndex]}</p>
-                        <button onClick={handleChangeMessage}>Click Me!</button>
-                        <button onClick={handleChangeColor}>Change Color</button>
-                        <div className="info">
-                            Created with React Flow, React, HTML, and CSS<br />
-                            Running from GitHub<br />
-                            Current time: {currentTime.toLocaleTimeString()}
+                        <h1>Test Pipeline Simulator</h1>
+                        <p>Hierarchical test pipeline visualization with real-time status monitoring</p>
+
+                        <div className="controls">
+                            <button onClick={handleRunTests}>Run Tests</button>
+                        </div>
+
+                        <div className="legend">
+                            <div className="legend-item">
+                                <div className="legend-led running"></div>
+                                <span>Running</span>
+                            </div>
+                            <div className="legend-item">
+                                <div className="legend-led passed"></div>
+                                <span>Passed</span>
+                            </div>
+                            <div className="legend-item">
+                                <div className="legend-led failed"></div>
+                                <span>Failed</span>
+                            </div>
                         </div>
                     </div>
-                    <FlowDiagram />
+                    <FlowDiagram key={key} />
                 </>
             );
         }
