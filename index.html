@@ -252,7 +252,8 @@
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
-        const { ReactFlow, Controls, Background } = window.ReactFlow;
+        const ReactFlow = window.ReactFlow.default || window.ReactFlow;
+        const { Controls, Background } = window.ReactFlow;
 
         // Test status constants
         const STATUS = {
@@ -289,7 +290,6 @@
             // Level 0 - Root
             const rootId = `node-${nodeId++}`;
             const level1Count = randomInRange(3, 5);
-            const level1Children = [];
 
             nodes.push({
                 id: rootId,
@@ -310,7 +310,6 @@
             for (let i = 0; i < level1Count; i++) {
                 const level1Id = `node-${nodeId++}`;
                 const level2Count = randomInRange(3, 5);
-                level1Children.push({ id: level1Id, childCount: level2Count });
 
                 nodes.push({
                     id: level1Id,
@@ -359,38 +358,28 @@
                 }
             }
 
-            return { nodes, edges, level1Children, level1Count };
+            return { nodes, edges };
         }
 
-        function FlowDiagram() {
-            const [pipelineData, setPipelineData] = useState(() => generateTestPipeline());
+        function FlowDiagram({ shouldRun }) {
+            const [pipelineData] = useState(() => generateTestPipeline());
             const [nodes, setNodes] = useState(pipelineData.nodes);
             const [edges] = useState(pipelineData.edges);
-            const [isRunning, setIsRunning] = useState(false);
 
             // Define custom node types
             const nodeTypes = useMemo(() => ({
                 testPipeline: TestPipelineNode
             }), []);
 
-            // Simulate test execution
-            const runTests = useCallback(() => {
-                setIsRunning(true);
-
-                // Reset all to running
-                setNodes(prevNodes => prevNodes.map(node => ({
-                    ...node,
-                    data: {
-                        ...node.data,
-                        childStatuses: node.data.childStatuses?.map(() => STATUS.RUNNING) || []
-                    }
-                })));
+            // Auto-run tests when shouldRun changes
+            useEffect(() => {
+                if (!shouldRun) return;
 
                 // Get all level 2 nodes (leaf nodes)
-                const level2Nodes = nodes.filter(n => n.data.level === 2);
+                const level2Nodes = pipelineData.nodes.filter(n => n.data.level === 2);
 
                 // Simulate each test completing after random delay
-                level2Nodes.forEach((node, index) => {
+                level2Nodes.forEach((node) => {
                     const delay = randomInRange(1000, 4000);
                     const willPass = Math.random() > 0.2; // 80% pass rate
 
@@ -401,7 +390,7 @@
 
                         const parentId = parentEdge.source;
 
-                        // Update level 2 status (for visual feedback)
+                        // Update status
                         setNodes(prevNodes => {
                             const newNodes = [...prevNodes];
 
@@ -460,19 +449,7 @@
                         });
                     }, delay);
                 });
-
-                // Mark as not running after max delay
-                setTimeout(() => {
-                    setIsRunning(false);
-                }, 5000);
-            }, [nodes, edges]);
-
-            const resetPipeline = () => {
-                const newPipeline = generateTestPipeline();
-                setPipelineData(newPipeline);
-                setNodes(newPipeline.nodes);
-                setIsRunning(false);
-            };
+            }, [shouldRun, edges, pipelineData.nodes]);
 
             return (
                 <div className="flow-container">
@@ -524,7 +501,7 @@
                             </div>
                         </div>
                     </div>
-                    <FlowDiagram key={key} />
+                    <FlowDiagram key={key} shouldRun={true} />
                 </>
             );
         }
