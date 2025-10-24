@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World App</title>
+    <title>Hello World App - React</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,7 +16,6 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -126,20 +128,12 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="emoji">👋</div>
-        <h1>Hello World!</h1>
-        <p>Welcome to your simple hello world app, running perfectly on your iPad!</p>
-        <button onclick="changeMessage()">Click Me!</button>
-        <button onclick="changeColor()">Change Color</button>
-        <div class="info" id="info">
-            Created with HTML, CSS, and JavaScript<br>
-            Running from GitHub
-        </div>
-    </div>
+    <div id="root"></div>
 
-    <script>
-        const messages = [
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const MESSAGES = [
             "Hello from GitHub! 🚀",
             "Welcome to the app! 🎉",
             "You clicked the button! 👍",
@@ -148,7 +142,7 @@
             "Hello World! 👋"
         ];
 
-        const colors = [
+        const COLORS = [
             "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
             "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
@@ -157,32 +151,51 @@
             "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
         ];
 
-        let messageIndex = 0;
-        let colorIndex = 0;
+        function App() {
+            const [messageIndex, setMessageIndex] = useState(5);
+            const [colorIndex, setColorIndex] = useState(0);
+            const [currentTime, setCurrentTime] = useState(new Date());
 
-        function changeMessage() {
-            messageIndex = (messageIndex + 1) % messages.length;
-            document.querySelector('p').textContent = messages[messageIndex];
-            document.querySelector('.emoji').style.animation = 'none';
-            setTimeout(() => {
-                document.querySelector('.emoji').style.animation = 'wave 2s ease-in-out infinite';
-            }, 10);
+            useEffect(() => {
+                // Update background color
+                document.body.style.background = COLORS[colorIndex];
+            }, [colorIndex]);
+
+            useEffect(() => {
+                // Update time every second
+                const timer = setInterval(() => {
+                    setCurrentTime(new Date());
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, []);
+
+            const handleChangeMessage = () => {
+                setMessageIndex((prev) => (prev + 1) % MESSAGES.length);
+            };
+
+            const handleChangeColor = () => {
+                setColorIndex((prev) => (prev + 1) % COLORS.length);
+            };
+
+            return (
+                <div className="container">
+                    <div className="emoji">👋</div>
+                    <h1>Hello World!</h1>
+                    <p>{MESSAGES[messageIndex]}</p>
+                    <button onClick={handleChangeMessage}>Click Me!</button>
+                    <button onClick={handleChangeColor}>Change Color</button>
+                    <div className="info">
+                        Created with React, HTML, and CSS<br />
+                        Running from GitHub<br />
+                        Current time: {currentTime.toLocaleTimeString()}
+                    </div>
+                </div>
+            );
         }
 
-        function changeColor() {
-            colorIndex = (colorIndex + 1) % colors.length;
-            document.body.style.background = colors[colorIndex];
-        }
-
-        // Display current date and time
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('info').innerHTML =
-                `Created with HTML, CSS, and JavaScript<br>Running from GitHub<br>Current time: ${now.toLocaleTimeString()}`;
-        }
-
-        updateTime();
-        setInterval(updateTime, 1000);
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>

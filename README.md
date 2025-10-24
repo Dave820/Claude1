@@ -50,9 +50,12 @@ You can also view the HTML file directly:
 
 ## Technologies Used
 
+- React 18 (loaded from CDN)
 - HTML5
 - CSS3 (with animations and gradients)
-- Vanilla JavaScript (no dependencies)
+- Babel (for JSX transformation)
+
+The app uses React hooks (useState, useEffect) for state management and side effects, making the code clean and maintainable while still running directly from GitHub without a build process.
 
 ## Browser Compatibility
 
