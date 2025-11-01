@@ -271,6 +271,11 @@
                             const suiteStatus = getSuiteStatus(suite);
                             const isExpanded = expandedSuites[suite.id];
 
+                            // Calculate passed tests count
+                            const totalTests = tests.length;
+                            const passedTests = tests.filter(test => test.data.status === STATUS.PASSED).length;
+                            const statusText = `${passedTests} of ${totalTests}`;
+
                             return React.createElement(React.Fragment, { key: suite.id },
                                 React.createElement('tr', {
                                     className: 'tree-row level-1',
@@ -283,7 +288,10 @@
                                         React.createElement('span', { className: 'tree-label' }, suite.data.label)
                                     ),
                                     React.createElement('td', { className: 'col-status' },
-                                        React.createElement('div', { className: `status-badge ${suiteStatus}` })
+                                        React.createElement('div', { className: 'status-cell' },
+                                            React.createElement('div', { className: `status-badge ${suiteStatus}` }),
+                                            React.createElement('span', { className: 'status-count' }, statusText)
+                                        )
                                     ),
                                     React.createElement('td', { className: 'col-time' }, '-')
                                 ),

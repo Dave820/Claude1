@@ -290,6 +290,20 @@ button:active {
     background: #d1d5db;
 }
 
+.status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.status-count {
+    font-size: 0.85em;
+    color: #666;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
 .flow-container {
     background: white;
     border-radius: 20px;
