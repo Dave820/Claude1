@@ -125,13 +125,103 @@
             background: #ef4444;
         }
 
+        .main-content {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .tree-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            min-width: 300px;
+            height: 600px;
+            overflow-y: auto;
+            animation: fadeIn 0.8s ease-in 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .tree-panel h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .tree-item {
+            margin: 5px 0;
+            padding: 8px 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .tree-item:hover {
+            background: #f0f0f0;
+        }
+
+        .tree-item.level-0 {
+            font-weight: bold;
+            font-size: 1em;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .tree-item.level-1 {
+            margin-left: 15px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .tree-item.level-2 {
+            margin-left: 30px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .tree-item.level-2.hidden-node {
+            opacity: 0.3;
+        }
+
+        .status-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-badge.running {
+            background: #4ade80;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-badge.passed {
+            background: #3b82f6;
+        }
+
+        .status-badge.failed {
+            background: #ef4444;
+        }
+
+        .status-badge.pending {
+            background: #d1d5db;
+        }
+
         .flow-container {
             background: white;
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 1200px;
-            width: 100%;
+            flex: 1;
             height: 600px;
             animation: fadeIn 0.8s ease-in 0.2s;
             animation-fill-mode: both;
@@ -284,6 +374,17 @@
             color: #e0e0e0;
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .tree-panel {
+                width: 100%;
+                height: 300px;
+            }
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
@@ -295,6 +396,10 @@
 
             .flow-container {
                 height: 500px;
+            }
+
+            .tree-panel {
+                height: 250px;
             }
 
             .legend {
@@ -494,6 +599,68 @@
 
         updateStatus('Creating components...');
 
+        // Tree Panel Component
+        function TreePanel({ nodes, edges }) {
+            // Build hierarchical structure
+            const rootNode = nodes.find(n => n.data.level === 0);
+            const suiteNodes = nodes.filter(n => n.data.level === 1).sort((a, b) => a.id.localeCompare(b.id));
+
+            const getTestsForSuite = (suiteId) => {
+                const testEdges = edges.filter(e => e.source === suiteId);
+                return testEdges.map(edge => nodes.find(n => n.id === edge.target)).filter(Boolean);
+            };
+
+            const getSuiteStatus = (suite) => {
+                const statuses = suite.data.childStatuses || [];
+                if (statuses.some(s => s === STATUS.FAILED)) return 'failed';
+                if (statuses.every(s => s === STATUS.PASSED)) return 'passed';
+                if (statuses.some(s => s === STATUS.RUNNING)) return 'running';
+                return 'pending';
+            };
+
+            return React.createElement('div', { className: 'tree-panel' },
+                React.createElement('h3', null, 'Test Hierarchy'),
+
+                // Root node
+                rootNode && React.createElement('div', {
+                    className: 'tree-item level-0',
+                    key: rootNode.id
+                },
+                    React.createElement('div', { className: 'status-badge' }),
+                    React.createElement('span', null, rootNode.data.label)
+                ),
+
+                // Suite nodes
+                suiteNodes.map(suite => {
+                    const tests = getTestsForSuite(suite.id);
+                    const suiteStatus = getSuiteStatus(suite);
+
+                    return React.createElement(React.Fragment, { key: suite.id },
+                        React.createElement('div', {
+                            className: 'tree-item level-1'
+                        },
+                            React.createElement('div', { className: `status-badge ${suiteStatus}` }),
+                            React.createElement('span', null, suite.data.label)
+                        ),
+
+                        // Test nodes for this suite
+                        tests.map(test => {
+                            const isHidden = test.hidden;
+                            const testStatus = test.data.status || 'pending';
+
+                            return React.createElement('div', {
+                                className: `tree-item level-2 ${isHidden ? 'hidden-node' : ''}`,
+                                key: test.id
+                            },
+                                React.createElement('div', { className: `status-badge ${testStatus}` }),
+                                React.createElement('span', null, test.data.label)
+                            );
+                        })
+                    );
+                })
+            );
+        }
+
         function FlowDiagram({ shouldRun }) {
             const [pipelineData] = useState(() => generateTestPipeline());
             const [nodes, setNodes] = useState(pipelineData.nodes);
@@ -638,19 +805,22 @@
                 });
             }, [shouldRun, edges, pipelineData.nodes]);
 
-            return React.createElement('div', { className: 'flow-container' },
-                React.createElement(ReactFlowModule, {
-                    nodes: nodes,
-                    edges: edges,
-                    nodeTypes: nodeTypes,
-                    onInit: setReactFlowInstance,
-                    fitView: true,
-                    attributionPosition: 'bottom-left',
-                    minZoom: 0.3,
-                    maxZoom: 1.5
-                },
-                    React.createElement(Controls),
-                    React.createElement(Background, { variant: 'dots', gap: 12, size: 1 })
+            return React.createElement('div', { className: 'main-content' },
+                React.createElement(TreePanel, { nodes: nodes, edges: edges }),
+                React.createElement('div', { className: 'flow-container' },
+                    React.createElement(ReactFlowModule, {
+                        nodes: nodes,
+                        edges: edges,
+                        nodeTypes: nodeTypes,
+                        onInit: setReactFlowInstance,
+                        fitView: true,
+                        attributionPosition: 'bottom-left',
+                        minZoom: 0.3,
+                        maxZoom: 1.5
+                    },
+                        React.createElement(Controls),
+                        React.createElement(Background, { variant: 'dots', gap: 12, size: 1 })
+                    )
                 )
             );
         }
