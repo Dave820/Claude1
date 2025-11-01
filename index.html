@@ -153,63 +153,124 @@
             padding-bottom: 10px;
         }
 
-        .tree-item {
-            margin: 5px 0;
-            padding: 8px 10px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .tree-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.9em;
+        }
+
+        .tree-table thead {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .tree-table th {
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 0.85em;
+        }
+
+        .tree-table th.col-name {
+            width: 50%;
+        }
+
+        .tree-table th.col-status {
+            width: 20%;
+            text-align: center;
+        }
+
+        .tree-table th.col-time {
+            width: 30%;
+            text-align: right;
+        }
+
+        .tree-table tbody tr {
             transition: background 0.2s;
         }
 
-        .tree-item:hover {
+        .tree-table tbody tr:hover {
             background: #f0f0f0;
         }
 
-        .tree-item.level-0 {
+        .tree-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tree-table td.col-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tree-table td.col-status {
+            text-align: center;
+        }
+
+        .tree-table td.col-time {
+            text-align: right;
+            font-family: monospace;
+            color: #666;
+        }
+
+        .tree-row.level-0 td {
             font-weight: bold;
             font-size: 1em;
             background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
-            margin-bottom: 10px;
         }
 
-        .tree-item.level-1 {
-            margin-left: 15px;
-            font-weight: 600;
-            color: #667eea;
+        .tree-row.level-0 td.col-time {
+            color: white;
+        }
+
+        .tree-row.level-1 {
             cursor: pointer;
             user-select: none;
         }
 
-        .tree-item.level-1:hover {
+        .tree-row.level-1 td.col-name {
+            font-weight: 600;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        .tree-row.level-1:hover {
             background: #e8eaf6;
+        }
+
+        .tree-row.level-2 td.col-name {
+            padding-left: 50px;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .tree-row.level-2.hidden-node {
+            opacity: 0.3;
         }
 
         .tree-toggle {
             width: 16px;
             height: 16px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 0.7em;
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
 
         .tree-toggle.collapsed {
             transform: rotate(-90deg);
         }
 
-        .tree-item.level-2 {
-            margin-left: 30px;
-            color: #666;
-            font-size: 0.85em;
-        }
-
-        .tree-item.level-2.hidden-node {
-            opacity: 0.3;
+        .tree-label {
+            flex: 1;
         }
 
         .status-badge {
@@ -653,51 +714,87 @@
                 }));
             };
 
+            const formatTime = (executionTime) => {
+                if (executionTime === undefined || executionTime === null) return '-';
+                return executionTime.toFixed(2) + 's';
+            };
+
             return React.createElement('div', { className: 'tree-panel' },
                 React.createElement('h3', null, 'Test Hierarchy'),
 
-                // Root node
-                rootNode && React.createElement('div', {
-                    className: 'tree-item level-0',
-                    key: rootNode.id
-                },
-                    React.createElement('div', { className: 'status-badge' }),
-                    React.createElement('span', null, rootNode.data.label)
-                ),
+                // Table structure
+                React.createElement('table', { className: 'tree-table' },
+                    // Table headers
+                    React.createElement('thead', null,
+                        React.createElement('tr', null,
+                            React.createElement('th', { className: 'col-name' }, 'Name'),
+                            React.createElement('th', { className: 'col-status' }, 'Status'),
+                            React.createElement('th', { className: 'col-time' }, 'Time')
+                        )
+                    ),
 
-                // Suite nodes
-                suiteNodes.map(suite => {
-                    const tests = getTestsForSuite(suite.id);
-                    const suiteStatus = getSuiteStatus(suite);
-                    const isExpanded = expandedSuites[suite.id];
-
-                    return React.createElement(React.Fragment, { key: suite.id },
-                        React.createElement('div', {
-                            className: 'tree-item level-1',
-                            onClick: () => toggleSuite(suite.id)
+                    // Table body
+                    React.createElement('tbody', null,
+                        // Root node
+                        rootNode && React.createElement('tr', {
+                            className: 'tree-row level-0',
+                            key: rootNode.id
                         },
-                            React.createElement('div', {
-                                className: `tree-toggle ${isExpanded ? '' : 'collapsed'}`
-                            }, '▼'),
-                            React.createElement('div', { className: `status-badge ${suiteStatus}` }),
-                            React.createElement('span', null, suite.data.label)
+                            React.createElement('td', { className: 'col-name' },
+                                React.createElement('span', { className: 'tree-label' }, rootNode.data.label)
+                            ),
+                            React.createElement('td', { className: 'col-status' },
+                                React.createElement('div', { className: 'status-badge' })
+                            ),
+                            React.createElement('td', { className: 'col-time' }, '-')
                         ),
 
-                        // Test nodes for this suite (only if expanded)
-                        isExpanded && tests.map(test => {
-                            const isHidden = test.hidden;
-                            const testStatus = test.data.status || 'pending';
+                        // Suite nodes
+                        suiteNodes.map(suite => {
+                            const tests = getTestsForSuite(suite.id);
+                            const suiteStatus = getSuiteStatus(suite);
+                            const isExpanded = expandedSuites[suite.id];
 
-                            return React.createElement('div', {
-                                className: `tree-item level-2 ${isHidden ? 'hidden-node' : ''}`,
-                                key: test.id
-                            },
-                                React.createElement('div', { className: `status-badge ${testStatus}` }),
-                                React.createElement('span', null, test.data.label)
+                            return React.createElement(React.Fragment, { key: suite.id },
+                                React.createElement('tr', {
+                                    className: 'tree-row level-1',
+                                    onClick: () => toggleSuite(suite.id)
+                                },
+                                    React.createElement('td', { className: 'col-name' },
+                                        React.createElement('div', {
+                                            className: `tree-toggle ${isExpanded ? '' : 'collapsed'}`
+                                        }, '▼'),
+                                        React.createElement('span', { className: 'tree-label' }, suite.data.label)
+                                    ),
+                                    React.createElement('td', { className: 'col-status' },
+                                        React.createElement('div', { className: `status-badge ${suiteStatus}` })
+                                    ),
+                                    React.createElement('td', { className: 'col-time' }, '-')
+                                ),
+
+                                // Test nodes for this suite (only if expanded)
+                                isExpanded && tests.map(test => {
+                                    const isHidden = test.hidden;
+                                    const testStatus = test.data.status || 'pending';
+                                    const executionTime = test.data.executionTime;
+
+                                    return React.createElement('tr', {
+                                        className: `tree-row level-2 ${isHidden ? 'hidden-node' : ''}`,
+                                        key: test.id
+                                    },
+                                        React.createElement('td', { className: 'col-name' },
+                                            React.createElement('span', { className: 'tree-label' }, test.data.label)
+                                        ),
+                                        React.createElement('td', { className: 'col-status' },
+                                            React.createElement('div', { className: `status-badge ${testStatus}` })
+                                        ),
+                                        React.createElement('td', { className: 'col-time' }, formatTime(executionTime))
+                                    );
+                                })
                             );
                         })
-                    );
-                })
+                    )
+                )
             );
         }
 
@@ -743,7 +840,8 @@
                                     hidden: false, // Show the node
                                     data: {
                                         ...newNodes[nodeIdx].data,
-                                        status: STATUS.RUNNING // Set own status to running
+                                        status: STATUS.RUNNING, // Set own status to running
+                                        startTime: Date.now() // Record start time
                                     }
                                 };
                             }
@@ -773,11 +871,17 @@
                                 // Update test node's own status
                                 const testNodeIdx = newNodes.findIndex(n => n.id === node.id);
                                 if (testNodeIdx !== -1) {
+                                    const endTime = Date.now();
+                                    const startTime = newNodes[testNodeIdx].data.startTime || endTime;
+                                    const executionTime = (endTime - startTime) / 1000; // Convert to seconds
+
                                     newNodes[testNodeIdx] = {
                                         ...newNodes[testNodeIdx],
                                         data: {
                                             ...newNodes[testNodeIdx].data,
-                                            status: willPass ? STATUS.PASSED : STATUS.FAILED
+                                            status: willPass ? STATUS.PASSED : STATUS.FAILED,
+                                            endTime: endTime,
+                                            executionTime: executionTime
                                         }
                                     };
                                 }
