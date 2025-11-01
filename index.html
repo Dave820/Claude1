@@ -180,6 +180,26 @@
             margin-left: 15px;
             font-weight: 600;
             color: #667eea;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-item.level-1:hover {
+            background: #e8eaf6;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            transition: transform 0.2s;
+        }
+
+        .tree-toggle.collapsed {
+            transform: rotate(-90deg);
         }
 
         .tree-item.level-2 {
@@ -601,9 +621,17 @@
 
         // Tree Panel Component
         function TreePanel({ nodes, edges }) {
+            // State to track which suites are expanded (all expanded by default)
+            const suiteNodes = nodes.filter(n => n.data.level === 1).sort((a, b) => a.id.localeCompare(b.id));
+            const initialExpanded = {};
+            suiteNodes.forEach(suite => {
+                initialExpanded[suite.id] = true;
+            });
+
+            const [expandedSuites, setExpandedSuites] = useState(initialExpanded);
+
             // Build hierarchical structure
             const rootNode = nodes.find(n => n.data.level === 0);
-            const suiteNodes = nodes.filter(n => n.data.level === 1).sort((a, b) => a.id.localeCompare(b.id));
 
             const getTestsForSuite = (suiteId) => {
                 const testEdges = edges.filter(e => e.source === suiteId);
@@ -616,6 +644,13 @@
                 if (statuses.every(s => s === STATUS.PASSED)) return 'passed';
                 if (statuses.some(s => s === STATUS.RUNNING)) return 'running';
                 return 'pending';
+            };
+
+            const toggleSuite = (suiteId) => {
+                setExpandedSuites(prev => ({
+                    ...prev,
+                    [suiteId]: !prev[suiteId]
+                }));
             };
 
             return React.createElement('div', { className: 'tree-panel' },
@@ -634,17 +669,22 @@
                 suiteNodes.map(suite => {
                     const tests = getTestsForSuite(suite.id);
                     const suiteStatus = getSuiteStatus(suite);
+                    const isExpanded = expandedSuites[suite.id];
 
                     return React.createElement(React.Fragment, { key: suite.id },
                         React.createElement('div', {
-                            className: 'tree-item level-1'
+                            className: 'tree-item level-1',
+                            onClick: () => toggleSuite(suite.id)
                         },
+                            React.createElement('div', {
+                                className: `tree-toggle ${isExpanded ? '' : 'collapsed'}`
+                            }, '▼'),
                             React.createElement('div', { className: `status-badge ${suiteStatus}` }),
                             React.createElement('span', null, suite.data.label)
                         ),
 
-                        // Test nodes for this suite
-                        tests.map(test => {
+                        // Test nodes for this suite (only if expanded)
+                        isExpanded && tests.map(test => {
                             const isHidden = test.hidden;
                             const testStatus = test.data.status || 'pending';
 
