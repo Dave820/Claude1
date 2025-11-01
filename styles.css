@@ -20,7 +20,6 @@ body {
     padding: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     text-align: center;
-    max-width: 95%;
     width: 100%;
     animation: fadeIn 0.8s ease-in;
     margin-bottom: 20px;
@@ -130,8 +129,9 @@ button:active {
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    width: 400px;
-    min-width: 350px;
+    width: 450px;
+    min-width: 400px;
+    max-width: 600px;
     height: 700px;
     overflow-y: auto;
     animation: fadeIn 0.8s ease-in 0.2s;
@@ -462,7 +462,21 @@ button:active {
     color: #e0e0e0;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 1024px) {
+    .tree-panel {
+        width: 500px;
+    }
+
+    .flow-container {
+        height: 750px;
+    }
+
+    .tree-panel {
+        height: 750px;
+    }
+}
+
+@media (max-width: 900px) {
     .main-content {
         flex-direction: column;
     }
