@@ -38,6 +38,12 @@ export function FlowDiagram({ shouldRun, onRef, ReactFlowModule, Controls, Backg
         testPipeline: TestPipelineNode
     }), []);
 
+    const defaultEdgeOptions = useMemo(() => ({
+        type: 'smoothstep',
+        animated: false,
+        style: { strokeWidth: 3 }
+    }), []);
+
     // Save results function
     const saveResults = () => {
         const results = {
@@ -265,6 +271,7 @@ export function FlowDiagram({ shouldRun, onRef, ReactFlowModule, Controls, Backg
                 nodes: nodes,
                 edges: edges,
                 nodeTypes: nodeTypes,
+                defaultEdgeOptions: defaultEdgeOptions,
                 onInit: setReactFlowInstance,
                 fitView: true,
                 attributionPosition: 'bottom-left',

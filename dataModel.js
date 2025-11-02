@@ -67,10 +67,7 @@ export function generateTestPipeline() {
             type: 'smoothstep',
             animated: false,
             style: { stroke: '#667eea', strokeWidth: 3 },
-            markerEnd: {
-                type: 'arrowclosed',
-                color: '#667eea'
-            }
+            markerEnd: 'arrowclosed'
         });
 
         // Level 2 - Individual tests on the right column
@@ -103,10 +100,7 @@ export function generateTestPipeline() {
                 type: 'smoothstep',
                 animated: false,
                 style: { stroke: '#764ba2', strokeWidth: 3 },
-                markerEnd: {
-                    type: 'arrowclosed',
-                    color: '#764ba2'
-                }
+                markerEnd: 'arrowclosed'
             });
         }
     }
