@@ -9,8 +9,8 @@ export function App({ ReactFlowModule, Controls, Background }) {
     const [key, setKey] = useState(0);
     const [flowDiagramRef, setFlowDiagramRef] = useState(null);
 
-    // Generate version timestamp
-    const versionTimestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    // Git commit version timestamp (update on each commit)
+    const VERSION = '2025-11-02 23:40:54';
 
     const handleRunTests = () => {
         setKey(prev => prev + 1);
@@ -24,26 +24,13 @@ export function App({ ReactFlowModule, Controls, Background }) {
 
     return React.createElement(React.Fragment, null,
         React.createElement('div', { className: 'container' },
-            React.createElement('h1', null, 'Test Pipeline Simulator'),
-            React.createElement('div', { className: 'version-info' }, `Version: ${versionTimestamp}`),
-            React.createElement('p', null, 'Hierarchical test pipeline visualization with real-time status monitoring'),
+            React.createElement('div', { className: 'header-bar' },
+                React.createElement('h1', null, 'Test Pipeline Simulator'),
+                React.createElement('div', { className: 'version-info' }, `Version: ${VERSION}`)
+            ),
             React.createElement('div', { className: 'controls' },
                 React.createElement('button', { onClick: handleRunTests }, 'Run Tests'),
                 React.createElement('button', { onClick: handleSaveResults }, 'Save Results')
-            ),
-            React.createElement('div', { className: 'legend' },
-                React.createElement('div', { className: 'legend-item' },
-                    React.createElement('div', { className: 'legend-led running' }),
-                    React.createElement('span', null, 'Running')
-                ),
-                React.createElement('div', { className: 'legend-item' },
-                    React.createElement('div', { className: 'legend-led passed' }),
-                    React.createElement('span', null, 'Passed')
-                ),
-                React.createElement('div', { className: 'legend-item' },
-                    React.createElement('div', { className: 'legend-led failed' }),
-                    React.createElement('span', null, 'Failed')
-                )
             )
         ),
         React.createElement(FlowDiagram, {
