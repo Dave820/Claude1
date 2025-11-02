@@ -423,8 +423,20 @@ button:active {
 }
 
 .react-flow__edge-path {
-    stroke: #94a3b8;
-    stroke-width: 2;
+    stroke: #667eea;
+    stroke-width: 3;
+}
+
+.react-flow__edge {
+    pointer-events: all;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+    stroke: #764ba2;
+}
+
+.react-flow__arrowhead {
+    fill: #667eea;
 }
 
 #error-display {

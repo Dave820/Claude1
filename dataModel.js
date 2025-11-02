@@ -64,7 +64,13 @@ export function generateTestPipeline() {
             id: `edge-${rootId}-${level1Id}`,
             source: rootId,
             target: level1Id,
-            style: { stroke: '#94a3b8', strokeWidth: 2 }
+            type: 'smoothstep',
+            animated: false,
+            style: { stroke: '#667eea', strokeWidth: 3 },
+            markerEnd: {
+                type: 'arrowclosed',
+                color: '#667eea'
+            }
         });
 
         // Level 2 - Individual tests on the right column
@@ -94,7 +100,13 @@ export function generateTestPipeline() {
                 id: `edge-${level1Id}-${level2Id}`,
                 source: level1Id,
                 target: level2Id,
-                style: { stroke: '#94a3b8', strokeWidth: 2 }
+                type: 'smoothstep',
+                animated: false,
+                style: { stroke: '#764ba2', strokeWidth: 3 },
+                markerEnd: {
+                    type: 'arrowclosed',
+                    color: '#764ba2'
+                }
             });
         }
     }
