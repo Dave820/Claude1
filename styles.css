@@ -53,6 +53,14 @@ p {
     margin-bottom: 20px;
 }
 
+.version-info {
+    font-size: 0.75em;
+    color: #999;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    font-family: monospace;
+}
+
 .controls {
     display: flex;
     gap: 15px;

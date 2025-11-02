@@ -9,6 +9,9 @@ export function App({ ReactFlowModule, Controls, Background }) {
     const [key, setKey] = useState(0);
     const [flowDiagramRef, setFlowDiagramRef] = useState(null);
 
+    // Generate version timestamp
+    const versionTimestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
     const handleRunTests = () => {
         setKey(prev => prev + 1);
     };
@@ -22,6 +25,7 @@ export function App({ ReactFlowModule, Controls, Background }) {
     return React.createElement(React.Fragment, null,
         React.createElement('div', { className: 'container' },
             React.createElement('h1', null, 'Test Pipeline Simulator'),
+            React.createElement('div', { className: 'version-info' }, `Version: ${versionTimestamp}`),
             React.createElement('p', null, 'Hierarchical test pipeline visualization with real-time status monitoring'),
             React.createElement('div', { className: 'controls' },
                 React.createElement('button', { onClick: handleRunTests }, 'Run Tests'),
