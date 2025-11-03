@@ -269,7 +269,11 @@ export function FlowDiagram({ shouldRun, onRef, ReactFlowModule, Controls, Backg
                 fitView: true,
                 attributionPosition: 'bottom-left',
                 minZoom: 0.3,
-                maxZoom: 1.5
+                maxZoom: 1.5,
+                connectionLineType: 'default',
+                edgesUpdatable: false,
+                edgesFocusable: false,
+                elementsSelectable: true
             },
                 React.createElement(Controls),
                 React.createElement(Background, { variant: 'dots', gap: 12, size: 1 })

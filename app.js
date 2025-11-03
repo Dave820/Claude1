@@ -10,7 +10,7 @@ export function App({ ReactFlowModule, Controls, Background }) {
     const [flowDiagramRef, setFlowDiagramRef] = useState(null);
 
     // Git commit version timestamp (update on each commit)
-    const VERSION = '2025-11-02 23:40:54';
+    const VERSION = '2025-11-03 00:30:35';
 
     const handleRunTests = () => {
         setKey(prev => prev + 1);
