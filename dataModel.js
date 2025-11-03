@@ -20,13 +20,32 @@ export function generateTestPipeline() {
     const rootId = `node-${nodeId++}`;
     const level1Count = randomInRange(3, 5);
 
-    // Calculate vertical spacing for level 1 nodes
-    const level1YSpacing = 120;
-    const level1YStart = 50;
+    // First pass: determine test counts for each suite to calculate proper spacing
+    const suitesInfo = [];
+    for (let i = 0; i < level1Count; i++) {
+        suitesInfo.push({
+            testCount: randomInRange(3, 5)
+        });
+    }
+
+    // Calculate total height needed and positions
+    const level2YSpacing = 80;
+    const suiteGap = 40; // Gap between different suites' test groups
+    let currentTestY = 50;
+
+    // Calculate suite Y positions (centered with their test groups)
+    for (let i = 0; i < level1Count; i++) {
+        const testGroupHeight = (suitesInfo[i].testCount - 1) * level2YSpacing;
+        suitesInfo[i].suiteY = currentTestY + testGroupHeight / 2;
+        suitesInfo[i].testsStartY = currentTestY;
+        currentTestY += testGroupHeight + suiteGap;
+    }
+
+    // Calculate total height and center the root node
+    const totalHeight = currentTestY - suiteGap - 50;
+    const rootY = 50 + totalHeight / 2;
 
     // Level 0 - Root node on the left, centered vertically
-    const rootY = level1YStart + (level1Count * level1YSpacing) / 2;
-
     nodes.push({
         id: rootId,
         type: 'testPipeline',
@@ -39,24 +58,23 @@ export function generateTestPipeline() {
         className: 'level-0'
     });
 
-    // Level 1 - Test suites in the middle column
+    // Level 1 and 2 - Suites and tests
     const level1X = 350;
+    const level2X = 700;
 
     for (let i = 0; i < level1Count; i++) {
         const level1Id = `node-${nodeId++}`;
-        const level2Count = randomInRange(3, 5);
-
-        const level1Y = level1YStart + (i * level1YSpacing);
+        const suiteInfo = suitesInfo[i];
 
         nodes.push({
             id: level1Id,
             type: 'testPipeline',
             data: {
                 label: `Suite ${i + 1}`,
-                childStatuses: Array(level2Count).fill(STATUS.RUNNING),
+                childStatuses: Array(suiteInfo.testCount).fill(STATUS.RUNNING),
                 level: 1
             },
-            position: { x: level1X, y: level1Y },
+            position: { x: level1X, y: suiteInfo.suiteY },
             className: 'level-1'
         });
 
@@ -68,14 +86,10 @@ export function generateTestPipeline() {
             targetHandle: 'target'
         });
 
-        // Level 2 - Individual tests on the right column
-        const level2X = 700;
-        const level2YSpacing = 80;
-        const level2YStart = level1Y - ((level2Count - 1) * level2YSpacing) / 2;
-
-        for (let j = 0; j < level2Count; j++) {
+        // Level 2 - Individual tests for this suite
+        for (let j = 0; j < suiteInfo.testCount; j++) {
             const level2Id = `node-${nodeId++}`;
-            const level2Y = level2YStart + (j * level2YSpacing);
+            const level2Y = suiteInfo.testsStartY + (j * level2YSpacing);
 
             nodes.push({
                 id: level2Id,
