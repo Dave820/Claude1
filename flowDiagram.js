@@ -6,9 +6,12 @@ import { TreePanel } from './treePanel.js';
 
 // Custom Node Component
 export function TestPipelineNode({ data }) {
+    const Handle = window.ReactFlow.Handle;
+
     // For Level 2 nodes (tests), use inline layout with LED next to label
     if (data.level === 2) {
         return React.createElement('div', { className: 'custom-node inline' },
+            React.createElement(Handle, { type: 'target', position: 'top' }),
             React.createElement('div', { className: 'node-label' }, data.label),
             data.status && React.createElement('div', { className: `led ${data.status}` })
         );
@@ -16,13 +19,15 @@ export function TestPipelineNode({ data }) {
 
     // For Level 0 and 1 nodes (pipeline and suites), use column layout
     return React.createElement('div', { className: 'custom-node' },
+        React.createElement(Handle, { type: 'target', position: 'top' }),
         React.createElement('div', { className: 'node-label' }, data.label),
         data.childStatuses && data.childStatuses.length > 0 &&
             React.createElement('div', { className: 'led-row' },
                 data.childStatuses.map((status, idx) =>
                     React.createElement('div', { key: idx, className: `led ${status}` })
                 )
-            )
+            ),
+        React.createElement(Handle, { type: 'source', position: 'bottom' })
     );
 }
 
