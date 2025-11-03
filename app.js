@@ -3,6 +3,18 @@
 
 import { FlowDiagram } from './flowDiagram.js';
 
+// Simple test nodes and edges for debugging
+const testNodes = [
+    { id: '1', position: { x: 100, y: 100 }, data: { label: 'Node 1' } },
+    { id: '2', position: { x: 300, y: 100 }, data: { label: 'Node 2' } },
+    { id: '3', position: { x: 500, y: 100 }, data: { label: 'Node 3' } }
+];
+
+const testEdges = [
+    { id: 'e1-2', source: '1', target: '2' },
+    { id: 'e2-3', source: '2', target: '3' }
+];
+
 export function App({ ReactFlowModule, Controls, Background }) {
     const { useState } = React;
 
@@ -10,7 +22,7 @@ export function App({ ReactFlowModule, Controls, Background }) {
     const [flowDiagramRef, setFlowDiagramRef] = useState(null);
 
     // Git commit version timestamp (update on each commit)
-    const VERSION = '2025-11-03 00:30:35';
+    const VERSION = '2025-11-03 08:41:56';
 
     const handleRunTests = () => {
         setKey(prev => prev + 1);
@@ -40,6 +52,20 @@ export function App({ ReactFlowModule, Controls, Background }) {
             ReactFlowModule: ReactFlowModule,
             Controls: Controls,
             Background: Background
-        })
+        }),
+        // Debug test frame with basic React Flow
+        React.createElement('div', { className: 'test-container' },
+            React.createElement('h3', null, 'Debug: Basic React Flow Test'),
+            React.createElement('div', { className: 'test-flow' },
+                React.createElement(ReactFlowModule, {
+                    nodes: testNodes,
+                    edges: testEdges,
+                    fitView: true
+                },
+                    React.createElement(Controls),
+                    React.createElement(Background)
+                )
+            )
+        )
     );
 }
