@@ -22,7 +22,7 @@ export function App({ ReactFlowModule, Controls, Background }) {
     const [flowDiagramRef, setFlowDiagramRef] = useState(null);
 
     // Git commit version timestamp (update on each commit)
-    const VERSION = '2025-11-03 08:41:56';
+    const VERSION = '2025-11-03 21:41:04';
 
     const handleRunTests = () => {
         setKey(prev => prev + 1);
@@ -56,11 +56,20 @@ export function App({ ReactFlowModule, Controls, Background }) {
         // Debug test frame with basic React Flow
         React.createElement('div', { className: 'test-container' },
             React.createElement('h3', null, 'Debug: Basic React Flow Test'),
+            React.createElement('p', { style: { fontSize: '0.9em', color: '#666', marginBottom: '10px' } },
+                `Nodes: ${testNodes.length}, Edges: ${testEdges.length}`
+            ),
+            React.createElement('pre', { style: { fontSize: '0.8em', background: '#f5f5f5', padding: '10px', marginBottom: '10px' } },
+                JSON.stringify({ nodes: testNodes, edges: testEdges }, null, 2)
+            ),
             React.createElement('div', { className: 'test-flow' },
                 React.createElement(ReactFlowModule, {
                     nodes: testNodes,
                     edges: testEdges,
-                    fitView: true
+                    fitView: true,
+                    onInit: (instance) => console.log('Test ReactFlow initialized:', instance),
+                    onNodesChange: (changes) => console.log('Nodes changed:', changes),
+                    onEdgesChange: (changes) => console.log('Edges changed:', changes)
                 },
                     React.createElement(Controls),
                     React.createElement(Background)

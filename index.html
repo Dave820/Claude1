@@ -65,6 +65,11 @@
 
         const { Controls, Background } = window.ReactFlow;
 
+        // Debug: Log what's available in ReactFlow
+        console.log('ReactFlow object:', window.ReactFlow);
+        console.log('ReactFlow keys:', Object.keys(window.ReactFlow));
+        console.log('ReactFlowModule:', ReactFlowModule);
+
         updateStatus('React components ready...');
         updateStatus('Rendering app...');
 
